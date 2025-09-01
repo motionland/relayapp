@@ -55,7 +55,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
       description: "Customize the app appearance",
     },
     {
-      href: "/business",
+      href: "/my-metro/settings/business",
       icon: <Building className="h-5 w-5" />,
       label: "Business Settings",
       description: "Manage business account settings",
