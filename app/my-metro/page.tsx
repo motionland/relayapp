@@ -711,7 +711,7 @@ export default function MyMetroPage() {
                   { label: "Packages", href: "/packages" },
                   { label: "History", href: "/history" },
                   { label: "Warehouse", href: "/metro" },
-                  { label: "Settings", href: "/settings" },
+                  { label: "Settings", href: "/my-metro/settings" },
                 ].map((item, i) => (
                   <Link
                     key={i}

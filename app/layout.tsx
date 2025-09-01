@@ -2,6 +2,8 @@ import type React from "react"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { WarehouseProvider } from "@/contexts/warehouse-context"
+import { ReduxProviders } from "@/redux"
+import AppInitializer from "@/components/appInitializer"
 
 export default function RootLayout({
   children,
@@ -15,11 +17,15 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
       <body className="bg-white dark:bg-black text-gray-900 dark:text-white">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <WarehouseProvider>
-            <main>{children}</main>
-          </WarehouseProvider>
-        </ThemeProvider>
+        <ReduxProviders>
+          <AppInitializer>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+              <WarehouseProvider>
+                <main>{children}</main>
+              </WarehouseProvider>
+            </ThemeProvider>
+          </AppInitializer>
+        </ReduxProviders>
       </body>
     </html>
   )

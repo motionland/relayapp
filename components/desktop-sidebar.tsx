@@ -16,11 +16,14 @@ import { HelpCircle, LogOut } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { ChevronUp, ChevronDown } from "lucide-react"
 import { useState } from "react"
+import { useAppSelector } from "@/redux"
 
 export default function DesktopSidebar() {
   const pathname = usePathname()
   const [businessSectionCollapsed, setBusinessSectionCollapsed] = useState(true)
   const [isCollapsed, setIsCollapsed] = useState(false)
+
+  const { status} = useAppSelector((s) => s.business)
 
   const navItems = [
     {
@@ -34,7 +37,7 @@ export default function DesktopSidebar() {
       label: "Packages (29)",
     },
     {
-      href: "/settings",
+      href: "/my-metro/settings",
       icon: <Settings className="h-5 w-5" />,
       label: "Settings",
     },
@@ -165,7 +168,7 @@ export default function DesktopSidebar() {
         </ul>
 
         {/* Business Section */}
-        {!isCollapsed && (
+        {status && status != 'pending' &&  !isCollapsed && (
           <div className="mt-8">
             <div
               className="flex items-center justify-between px-4 cursor-pointer group"
