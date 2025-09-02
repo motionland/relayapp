@@ -1,9 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import businessReducer from "./feature/business/businessSlice";
+import { businessReducer } from "./feature/business";
+import { authReducer } from "./feature/auth";
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     business: businessReducer,
+    
   },
   // middleware: (getDefault) => getDefault(), // default fine
 });
