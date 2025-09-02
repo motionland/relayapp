@@ -45,6 +45,11 @@ export default function AdminSidebar() {
       label: "All Packages",
     },
     {
+      href: "/admin/bussiness-applications",
+      icon: <FileText className="h-5 w-5" />,
+      label: "Business Applications",
+    },
+    {
       href: "/admin/settings",
       icon: <Settings className="h-5 w-5" />,
       label: "Settings",

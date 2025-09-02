@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Shield, Package, ScanLine, ScanFaceIcon, Truck } from "lucide-react"
+import { Shield, Package, ScanLine, ScanFaceIcon, Truck, Building2, Users, FileCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function HomePage() {
   return (
@@ -72,6 +73,69 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
+
+
+          </div>
+        </section>
+        <section className="container mx-auto px-4 mt-5">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-6 w-6 text-blue-600" />
+                  Business Application
+                </CardTitle>
+                <CardDescription>Apply for a business account to access our premium mail services</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <Shield className="h-4 w-4 text-green-600" />
+                    Secure document verification
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <Users className="h-4 w-4 text-green-600" />
+                    Team member management
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <FileCheck className="h-4 w-4 text-green-600" />
+                    Fast approval process
+                  </div>
+                  <Link href="/my-metro/settings/business">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Start Application</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-6 w-6 text-purple-600" />
+                  Admin Dashboard
+                </CardTitle>
+                <CardDescription>Manage and review business applications</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <FileCheck className="h-4 w-4 text-green-600" />
+                    Review applications
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <Shield className="h-4 w-4 text-green-600" />
+                    Verify documents
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <Building2 className="h-4 w-4 text-green-600" />
+                    Approve/decline accounts
+                  </div>
+                  <Link href="/admin/bussiness-applications">
+                    <Button className="w-full bg-purple-600 hover:bg-purple-700">Admin Access</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
       </main>
