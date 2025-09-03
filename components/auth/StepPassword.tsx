@@ -12,11 +12,12 @@ import {
 } from "@/redux/feature/authentication"
 import { useAppDispatch, useAppSelector } from "@/redux"
 import { loginWithPasswordOrPin } from "@/redux/feature/authentication/authenticationThunks"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 export function StepPassword() {
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const patchname = usePathname()
   const { formData, isLoading, tokenLogin, error } = useAppSelector(
     (s) => s.authentication
   )
@@ -46,7 +47,11 @@ export function StepPassword() {
   useEffect(() => {
     const authToken = Cookies.get("auth_token")
     if (authToken) {
-      router.push("/admin")
+      if(patchname.startsWith("/admin")) {
+        router.push("/admin")
+      } else {
+        router.push("/my-metro")
+      }
     }
   }, [router])
 

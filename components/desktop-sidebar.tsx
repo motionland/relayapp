@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Settings, Building, Home, Package, Truck, FileText, User, Bell } from "lucide-react"
 import {
@@ -15,10 +15,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { HelpCircle, LogOut } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { ChevronUp, ChevronDown } from "lucide-react"
-import { useState } from "react"
-import { useAppSelector } from "@/redux"
+import { useCallback, useState } from "react"
+import { useAppDispatch, useAppSelector } from "@/redux"
+import { logout } from "@/redux/feature/authentication/authenticationThunks"
 
 export default function DesktopSidebar() {
+  const { refresh } = useRouter()
+  const dispatch = useAppDispatch()
   const pathname = usePathname()
   const [businessSectionCollapsed, setBusinessSectionCollapsed] = useState(true)
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -88,6 +91,13 @@ export default function DesktopSidebar() {
       label: "Business Billing",
     },
   ]
+
+  const handleLogout = useCallback(async () => {
+    await dispatch(
+      logout()
+    )
+    refresh()
+  }, [dispatch])
 
   return (
     <div
@@ -317,7 +327,7 @@ export default function DesktopSidebar() {
               <span>Documentation</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>
