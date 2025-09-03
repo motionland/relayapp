@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { businessReducer } from "./feature/business";
 import { authReducer } from "./feature/auth";
+import { authenticationReducer } from "./feature/authentication";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    authentication: authenticationReducer,
     business: businessReducer,
     
   },

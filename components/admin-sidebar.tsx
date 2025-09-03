@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   Settings,
@@ -26,10 +26,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { HelpCircle, LogOut, ChevronUp, ChevronDown } from "lucide-react"
-import { useState } from "react"
+import { useCallback, useState } from "react"
+import { useAppDispatch } from "@/redux"
+import { logout } from "@/redux/feature/authentication/authenticationThunks"
 
 export default function AdminSidebar() {
   const pathname = usePathname()
+  const { refresh } = useRouter()
+  const dispatch = useAppDispatch()
   const [managementSectionCollapsed, setManagementSectionCollapsed] = useState(true)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
@@ -91,6 +95,13 @@ export default function AdminSidebar() {
       label: "System Settings",
     },
   ]
+
+  const handleLogout = useCallback(async () => {
+    await dispatch(
+      logout()
+    )
+    refresh()
+  }, [dispatch])
 
   return (
     <div
@@ -283,7 +294,7 @@ export default function AdminSidebar() {
                 <span>Documentation</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

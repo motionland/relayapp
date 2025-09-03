@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const api = axios.create({
   baseURL:
@@ -7,8 +8,7 @@ const api = axios.create({
 });
 
 export const tokenStorage = {
-  setLoginToken: (token: string) =>
-    localStorage.setItem("login_token", token),
+  setLoginToken: (token: string) => localStorage.setItem("login_token", token),
   getLoginToken: () => localStorage.getItem("login_token"),
   clearLoginToken: () => localStorage.removeItem("login_token"),
 
@@ -23,12 +23,10 @@ export const tokenStorage = {
 
 api.interceptors.request.use(
   (config) => {
-    const authToken = tokenStorage.getAuthToken();
-    const loginToken = tokenStorage.getLoginToken();
+    const authToken = Cookies.get("auth_token");
 
-    const token = authToken || loginToken;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`;
     }
 
     return config;
