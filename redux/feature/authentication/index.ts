@@ -1,3 +1,3 @@
 export * from './authenticationSlice'
-// export * from './authThunk'
+export * from './authenticationThunks'
 export { default as authenticationReducer } from "./authenticationSlice";
