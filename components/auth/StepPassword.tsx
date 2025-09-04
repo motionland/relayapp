@@ -50,7 +50,7 @@ export function StepPassword() {
       if(patchname.startsWith("/admin")) {
         router.push("/admin")
       } else {
-        router.push("/my-metro")
+        router.push("/")
       }
     }
   }, [router])

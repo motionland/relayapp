@@ -6,7 +6,7 @@ export default function AdminLoginPage() {
   const token = cookies().get("auth_token")?.value
 
   if (token) {
-    redirect("/my-metro") 
+    redirect("/") 
   }
 
   return (
