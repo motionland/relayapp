@@ -18,8 +18,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal } from "lucide-react"
+import { EmailTempleteList } from "@/components/admin/system/email-templete/card/CardlistEmailTemplete"
+import TemplateEmailEditor from "@/components/admin/system/email-templete/editor/EmailTempleteEditor"
+import { useAppSelector } from "@/redux"
 
 export default function CommunicationPage() {
+  const { showEmailTemplateForm, detail } = useAppSelector(s => s.emailTemplete)
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [editingTemplate, setEditingTemplate] = useState<any | null>(null)
   const [editingSMSTemplate, setEditingSMSTemplate] = useState<any | null>(null)
@@ -605,7 +609,7 @@ The [app_name] Team`,
   }
 
   // Email Template Editor
-  if (editingTemplate) {
+  if (showEmailTemplateForm.open) {
     return (
       <div className="p-8 max-w-7xl">
         <div className="mb-8">
@@ -618,7 +622,7 @@ The [app_name] Team`,
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Email Template</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
                 Template Key:{" "}
-                <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">{editingTemplate.key}</code>
+                <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">{detail?.key}</code>
               </p>
             </div>
           </div>
@@ -626,104 +630,7 @@ The [app_name] Team`,
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* Template Editor Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Template Editor</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="templateName">Template Name</Label>
-                <Input id="templateName" defaultValue={editingTemplate.name} placeholder="Enter template name..." />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="templateKey">Template Key</Label>
-                <Input
-                  id="templateKey"
-                  defaultValue={editingTemplate.key}
-                  placeholder="template_key"
-                  className="font-mono"
-                  disabled
-                />
-                <p className="text-xs text-gray-500">Template key cannot be changed</p>
-              </div>
-
-              {editingTemplate.key !== "email_header" && editingTemplate.key !== "email_footer" && (
-                <div className="space-y-2">
-                  <Label htmlFor="templateSubject">Subject Line</Label>
-                  <Input
-                    id="templateSubject"
-                    value={templateSubject}
-                    onChange={(e) => setTemplateSubject(e.target.value)}
-                    placeholder="Enter subject line..."
-                    className="font-mono"
-                  />
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="templateContent">
-                  {editingTemplate.key === "email_header" || editingTemplate.key === "email_footer"
-                    ? "HTML Template"
-                    : "Email Content"}
-                </Label>
-                <Textarea
-                  id="templateContent"
-                  rows={editingTemplate.key === "email_header" || editingTemplate.key === "email_footer" ? 20 : 12}
-                  value={templateContent}
-                  onChange={(e) => setTemplateContent(e.target.value)}
-                  placeholder="Enter your email template content here..."
-                  className="font-mono"
-                />
-                <p className="text-xs text-gray-500">
-                  Use variables like [first_name], [app_name], [pickup_code], etc.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="templateLanguage">Language</Label>
-                <Select defaultValue="en_US">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en_US">English (US)</SelectItem>
-                    <SelectItem value="es_ES">Spanish (ES)</SelectItem>
-                    <SelectItem value="fr_FR">French (FR)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="templateStatus">Status</Label>
-                <Select defaultValue="active">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="draft">Draft</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex space-x-2 pt-4">
-                <Button variant="outline">
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
-                </Button>
-                <Button variant="outline">
-                  <Send className="h-4 w-4 mr-2" />
-                  Test Send
-                </Button>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Template
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <TemplateEmailEditor />
 
           {/* Email Preview */}
           <Card>
@@ -772,7 +679,7 @@ The [app_name] Team`,
                   </div>
 
                   {/* Email Subject */}
-                  {editingTemplate.key !== "email_header" && editingTemplate.key !== "email_footer" && (
+                  {detail?.key !== "email_header" && detail?.key !== "email_footer" && (
                     <div className="px-4 py-2 bg-blue-50 border-b">
                       <div className="font-semibold text-black text-sm">{replaceVariables(templateSubject)}</div>
                     </div>
@@ -780,7 +687,7 @@ The [app_name] Team`,
 
                   {/* Email Body */}
                   <div className="p-4 bg-white max-h-96 overflow-y-auto">
-                    {editingTemplate.key === "email_header" || editingTemplate.key === "email_footer" ? (
+                    {detail?.key === "email_header" || detail?.key === "email_footer" ? (
                       <div className="text-xs font-mono bg-gray-100 p-3 rounded">
                         <div className="text-gray-600 mb-2">HTML Preview:</div>
                         <div className="whitespace-pre-wrap text-gray-800">{templateContent}</div>
@@ -846,7 +753,7 @@ The [app_name] Team`,
                             </div>
 
                             {/* Subject Line */}
-                            {editingTemplate.key !== "email_header" && editingTemplate.key !== "email_footer" && (
+                            {detail?.key !== "email_header" && detail?.key !== "email_footer" && (
                               <div className="font-semibold text-black text-sm mb-1">
                                 {replaceVariables(templateSubject)}
                               </div>
@@ -856,7 +763,7 @@ The [app_name] Team`,
 
                           {/* Email Body */}
                           <div className="p-4">
-                            {editingTemplate.key === "email_header" || editingTemplate.key === "email_footer" ? (
+                            {detail?.key === "email_header" || detail?.key === "email_footer" ? (
                               <div className="text-xs font-mono bg-gray-100 p-2 rounded">
                                 <div className="text-gray-600 mb-1 text-xs">HTML:</div>
                                 <div className="whitespace-pre-wrap text-gray-800 text-xs leading-tight">
@@ -962,213 +869,7 @@ The [app_name] Team`,
 
         {/* Email Templates Tab */}
         <TabsContent value="email-templates" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Mail className="h-5 w-5" />
-                    Email Templates
-                  </CardTitle>
-                </div>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Email Template
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Group email templates by category */}
-                {[
-                  {
-                    category: "📩 User Account & Access",
-                    templates: [
-                      {
-                        key: "user_welcome_email",
-                        name: "User Welcome Email",
-                        subject: "Welcome to [app_name]!",
-                        preview: "Welcome to [app_name]! We're glad you're here.",
-                      },
-                      {
-                        key: "user_request_password_reset",
-                        name: "User Request Password Reset",
-                        subject: "[app_name] Password Reset",
-                        preview: "Use the link below to reset your password for [app_name].",
-                      },
-                      {
-                        key: "user_password_reset",
-                        subject: "Your [app_name] password has been reset",
-                        preview: "Your password was successfully updated.",
-                      },
-                      {
-                        key: "user_account_locked_out",
-                        subject: "[app_name] account has been locked",
-                        preview: "Too many failed login attempts. Your account is temporarily locked.",
-                      },
-                      {
-                        key: "user_verify_email",
-                        subject: "Verify your email with [app_name]",
-                        preview: "Click the link below to verify your email and activate your account.",
-                      },
-                      {
-                        key: "user_verified",
-                        subject: "Verification success for [app_name]",
-                        preview: "Your email address has been verified. You may now sign in.",
-                      },
-                      {
-                        key: "user_logged_in",
-                        subject: "Login Success for [app_name]",
-                        preview: "You successfully logged in. If this wasn't you, please contact us.",
-                      },
-                    ],
-                  },
-                  {
-                    category: "📦 Locker & Pickup Notifications",
-                    templates: [
-                      {
-                        key: "delivery_confirmation",
-                        subject: "[app_name]: Package from [sender_name] delivered",
-                        preview: "In locker [locker_id] at [locker_location]. Access code: [locker_access_code].",
-                      },
-                      {
-                        key: "pickup_ready",
-                        subject: "[app_name]: Package from [sender_name] ready",
-                        preview: "Ready at [facility_name]. Hours: [hub_hours]. Bring your ID.",
-                      },
-                      {
-                        key: "reminder",
-                        subject: "[app_name]: Reminder: Package from [sender_name]",
-                        preview: "Please collect it by [pickup_deadline_date].",
-                      },
-                      {
-                        key: "urgent_pickup",
-                        subject: "[app_name]: Final Reminder – Pickup by [pickup_date]",
-                        preview: "Uncollected packages will be returned.",
-                      },
-                      {
-                        key: "pickup_confirmation",
-                        subject: "[app_name]: Package from [sender_name] picked up",
-                        preview: "([tracking_number]) picked up on [pickup_date].",
-                      },
-                    ],
-                  },
-                  {
-                    category: "🚚 Delivery & Exception Alerts",
-                    templates: [
-                      {
-                        key: "delay_notification",
-                        subject: "[app_name]: Delay Notice – Package from [sender_name]",
-                        preview: "Sorry! Your package is delayed. Notification will follow upon arrival.",
-                      },
-                      {
-                        key: "special_handling",
-                        subject: "[app_name]: Special Handling Required",
-                        preview: "([type_of_package]) needs pickup at [facility_name] before [pickup_date].",
-                      },
-                      {
-                        key: "received",
-                        subject: "[app_name]: Package from [sender_name] has arrived",
-                        preview: "Pick up at your earliest convenience at [facility_name].",
-                      },
-                    ],
-                  },
-                  {
-                    category: "✉️ Onboarding & Billing",
-                    templates: [
-                      {
-                        key: "welcome_to_metro_relay",
-                        subject: "Welcome to [app_name] – Your New Hub",
-                        preview: "[customer_address_and_code] [facility_address]. Hub hours: [hub_hours].",
-                      },
-                      {
-                        key: "payment_declined",
-                        subject: "[app_name]: Payment Failed for [sender_name]",
-                        preview:
-                          "Payment on [date] ($[amount]/mo) declined. Please update via dashboard to avoid interruption.",
-                      },
-                    ],
-                  },
-                  {
-                    category: "🎨 Headers & Footers",
-                    templates: [
-                      {
-                        key: "email_header",
-                        subject: "N/A (Header Template)",
-                        preview: "HTML email header with logo, branding, and styling.",
-                      },
-                      {
-                        key: "email_footer",
-                        subject: "N/A (Footer Template)",
-                        preview: "HTML email footer with contact info, unsubscribe, and legal links.",
-                      },
-                    ],
-                  },
-                ].map((group) => (
-                  <div key={group.category} className="border rounded-lg">
-                    <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b">
-                      <h3 className="font-semibold text-lg">{group.category}</h3>
-                    </div>
-
-                    <div className="border rounded-lg">
-                      <div className="grid grid-cols-4 gap-4 p-4 border-b font-medium text-sm bg-gray-50 dark:bg-gray-800">
-                        <div>Template Key</div>
-                        <div>Subject</div>
-                        <div>Body Preview</div>
-                        <div>Actions</div>
-                      </div>
-
-                      <div className="divide-y">
-                        {group.templates.map((template) => (
-                          <div
-                            key={template.key}
-                            className="grid grid-cols-4 gap-4 p-4 text-sm hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                          >
-                            <div className="font-mono text-xs text-blue-600">{template.key}</div>
-                            <div className="font-mono text-xs text-gray-700 dark:text-gray-300">{template.subject}</div>
-                            <div className="text-gray-600 dark:text-gray-400 text-xs">{template.preview}</div>
-                            <div className="flex justify-start">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => setSelectedTemplate(template.key)}>
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    Preview
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleEditTemplate(template.key)}>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem>
-                                    <Copy className="mr-2 h-4 w-4" />
-                                    Duplicate
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem>
-                                    <Send className="mr-2 h-4 w-4" />
-                                    Test Send
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="text-red-600">
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <EmailTempleteList />
         </TabsContent>
 
         {/* SMS Templates Tab */}
