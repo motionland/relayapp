@@ -50,7 +50,7 @@ export const CardEmailTemplete: React.FC<CardEmailTemplete> = ({ item }) => {
 
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this template?")) {
-      dispatch(deleteEmailTemplate(item.id));
+      dispatch(deleteEmailTemplate(item.key));
     }
   };
 

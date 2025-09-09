@@ -1,0 +1,51 @@
+export const replaceVariables = (text: string) => {
+  return text
+    // Basic info
+    .replace(/\[app_name\]/g, "Metro Package Manager")
+    .replace(/\[first_name\]/g, "John")
+    .replace(/\[last_name\]/g, "Doe")
+    .replace(/\[sender_name\]/g, "Amazon")
+    .replace(/\[locker_id\]/g, "L-42")
+    .replace(/\[locker_location\]/g, "Main Office Lobby")
+    .replace(/\[locker_access_code\]/g, "8472")
+    .replace(/\[facility_address\]/g, "123 Main St, Downtown")
+    .replace(/\[facility_name\]/g, "Main Office")
+    .replace(/\[support_email\]/g, "support@metropackage.com")
+    .replace(/\[support_phone\]/g, "(555) 123-4567")
+    .replace(/\[tracking_number\]/g, "1Z999AA1234567890")
+    .replace(/\[pickup_code\]/g, "12345")
+    .replace(/\[pickup_deadline\]/g, "Jan 22")
+    .replace(/\[pickup_date\]/g, "Jan 20")
+    .replace(/\[pickup_deadline_date\]/g, "January 22, 2024")
+    .replace(/\[hub_hours\]/g, "Mon-Fri 9AM-6PM")
+    .replace(/\[customer_address_and_code\]/g, "John Doe #12345")
+    .replace(/\[date\]/g, "Jan 15")
+    .replace(/\[amount\]/g, "29.99")
+    .replace(/\[type_of_package\]/g, "Fragile Item")
+
+    // Theme colors
+    .replace(/\[theme.anchor_color\]/g, "#1E88E5")
+    .replace(/\[theme.button_color\]/g, "#f5f7fa")
+    .replace(/\[theme.body_bg_color\]/g, "#f5f7fa")
+    .replace(/\[theme.callout_color\]/g, "#000000")
+    .replace(/\[theme.button_bg_color\]/g, "#f5f7fa")
+    .replace(/\[theme.footer_bg_color\]/g, "#fff8e8")
+    .replace(/\[theme.header_bg_color\]/g, "#fff8e8")
+    .replace(/\[theme.callout_bg_color\]/g, "#fffcf4")
+    .replace(/\[theme.content_bg_color\]/g, "#ffffff")
+    .replace(/\[theme.body_color\]/g, "#000000")
+
+    // URLs
+    .replace(/\[urls.unsubscribe_url\]/g, "https://google.com")
+    .replace(/\[urls.privacy_policy_url\]/g, "https://google.com")
+    .replace(/\[urls.google_wallet_url\]/g, "https://google.com")
+    .replace(/\[urls.apple_wallet_url\]/g, "https://google.com")
+    .replace(/\[urls.play_store_url\]/g, "https://google.com")
+    .replace(/\[urls.app_store_url\]/g, "https://google.com")
+    .replace(/\[urls.tiktok_url\]/g, "https://google.com")
+    .replace(/\[urls.x_url\]/g, "https://google.com")
+    .replace(/\[urls.youtube_url\]/g, "https://google.com")
+    .replace(/\[urls.instagram_url\]/g, "https://google.com")
+    .replace(/\[urls.pinterest_url\]/g, "https://google.com")
+    .replace(/\[urls.facebook_url\]/g, "https://google.com");
+};

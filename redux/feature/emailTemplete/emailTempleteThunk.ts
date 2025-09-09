@@ -13,7 +13,8 @@ export interface StoreEmailTemplateRequest {
     title: string;
     content: string;
     category?: string | null;
-    status?: 'active' | 'inactive' | 'draft'
+    status: 'active' | 'inactive' | 'draft',
+    type: "email" | 'system', 
 }
 
 interface UpdateEmailTemplate extends StoreEmailTemplateRequest {}
@@ -36,7 +37,9 @@ export interface EmailTemplateResource {
     title: string;
     content: string;
     logo?: string;
-    category?: string;
+    category: string;
+    status: 'active' | 'inactive' | 'draft'
+    type: "email" | 'system', 
     created_at: Date | string;
     updated_at?: Date | string;
     deleted_at?: Date | string;

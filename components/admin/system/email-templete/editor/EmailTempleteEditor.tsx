@@ -17,14 +17,18 @@ import { Eye, Save, Send } from "lucide-react";
 import {
   createEmailTemplate,
   hideForm,
+  setDraft,
+  clearDraft,
   StoreEmailTemplateRequest,
   updateEmailTemplate,
 } from "@/redux/feature/emailTemplete";
 import { useAppDispatch, useAppSelector } from "@/redux";
 
+import beautify from "js-beautify";
+
 const TemplateEmailEditor = () => {
   const dispatch = useAppDispatch();
-  const { showEmailTemplateForm, detail: initial } = useAppSelector(
+  const { showEmailTemplateForm, detail: initial, draft } = useAppSelector(
     (s) => s.emailTemplete
   );
   const { mode } = showEmailTemplateForm;
@@ -38,46 +42,54 @@ const TemplateEmailEditor = () => {
     title: "",
     category: "",
     status: "active",
+    type: "email",
   });
 
+  // Prefill dari detail atau draft
   useEffect(() => {
-    if ((initial && mode === "edit") || mode === "duplicate") {
+    if (draft) {
+      setForm(draft as StoreEmailTemplateRequest);
+    } else if ((initial && mode === "edit") || mode === "duplicate") {
       setForm({
         name: initial?.name || "",
         key: initial?.key || "",
         subject: initial?.subject || "",
-        content: initial?.content || "",
+        content: beautify.html(initial?.content || "", { indent_size: 2 }),
         language: initial?.language || "en_US",
         title: initial?.title || "",
         category: initial?.category || "",
-        status: "active",
+        status: initial?.status || "active",
+        type: initial?.type || "email",
       });
     }
-  }, [initial, mode]);
+  }, [initial, mode, draft]);
 
   const handleChange =
     (field: keyof StoreEmailTemplateRequest) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+      const newForm = { ...form, [field]: e.target.value };
+      setForm(newForm);
+      dispatch(setDraft(newForm));
     };
 
   const handleSave = async () => {
-    if (initial && mode === 'edit') {
+    if (initial && mode === "edit") {
       await dispatch(
         updateEmailTemplate({
           key: initial.key,
-          body: form
+          body: form,
         })
-      )
+      );
     } else {
       await dispatch(
         createEmailTemplate({
           ...form,
-          title: form.name
+          title: form.name,
         })
-      )
+      );
     }
-    dispatch(hideForm())
+    dispatch(clearDraft());
+    dispatch(hideForm());
   };
 
   const isHeaderOrFooter =
@@ -170,9 +182,11 @@ const TemplateEmailEditor = () => {
           <Label htmlFor="templateLanguage">Language</Label>
           <Select
             value={form.language}
-            onValueChange={(val) =>
-              setForm((prev) => ({ ...prev, language: val as 'en_US' }))
-            }
+            onValueChange={(val) => {
+              const newForm = { ...form, language: val as "en_US" };
+              setForm(newForm);
+              dispatch(setDraft(newForm));
+            }}
           >
             <SelectTrigger>
               <SelectValue />
@@ -190,9 +204,14 @@ const TemplateEmailEditor = () => {
           <Label htmlFor="templateStatus">Status</Label>
           <Select
             value={form.status}
-            onValueChange={(val) =>
-              setForm((prev) => ({ ...prev, status: val as 'active' | 'inactive' | 'draft' }))
-            }
+            onValueChange={(val) => {
+              const newForm = {
+                ...form,
+                status: val as "active" | "inactive" | "draft",
+              };
+              setForm(newForm);
+              dispatch(setDraft(newForm));
+            }}
           >
             <SelectTrigger>
               <SelectValue />

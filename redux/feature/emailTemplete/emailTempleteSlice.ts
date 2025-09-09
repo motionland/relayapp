@@ -6,6 +6,7 @@ import {
   updateEmailTemplate,
   deleteEmailTemplate,
   EmailTemplateResource,
+  StoreEmailTemplateRequest,
 } from "@/redux/feature/emailTemplete/emailTempleteThunk";
 
 type FormMode = "create" | "edit" | "duplicate";
@@ -13,6 +14,7 @@ type FormMode = "create" | "edit" | "duplicate";
 interface EmailTemplateState {
   list: EmailTemplateResource[];
   detail: EmailTemplateResource | null;
+  draft?: Partial<StoreEmailTemplateRequest>;
   loading: boolean;
   error: string | null;
   showEmailTemplateForm: {
@@ -24,6 +26,7 @@ interface EmailTemplateState {
 const initialState: EmailTemplateState = {
   list: [],
   detail: null,
+  draft: undefined,
   loading: false,
   error: null,
   showEmailTemplateForm: {
@@ -52,10 +55,32 @@ export const emailTemplateSlice = createSlice({
     ) {
       state.showEmailTemplateForm = { open: true, mode: action.payload.mode };
       state.detail = action.payload.template || null;
+      state.draft = action.payload.template
+        ? { ...action.payload.template }
+        : {
+            name: "",
+            key: "",
+            subject: "",
+            content: "",
+            language: "en_US",
+            title: "",
+            category: "",
+            status: "active",
+          };
     },
     hideForm(state) {
       state.showEmailTemplateForm = { open: false, mode: null };
       state.detail = null;
+      state.draft = undefined;
+    },
+    setDraft(state, action: PayloadAction<Partial<StoreEmailTemplateRequest>>) {
+      state.draft = {
+        ...state.draft,
+        ...action.payload,
+      };
+    },
+    clearDraft(state) {
+      state.draft = undefined;
     },
   },
   extraReducers: (builder) => {
@@ -144,6 +169,7 @@ export const emailTemplateSlice = createSlice({
   },
 });
 
-export const { clearDetail, clearError, showForm, hideForm } = emailTemplateSlice.actions;
+export const { clearDetail, clearError, showForm, hideForm, setDraft, clearDraft } =
+  emailTemplateSlice.actions;
 
 export default emailTemplateSlice.reducer;
