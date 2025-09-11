@@ -10,11 +10,6 @@ export default withAuth(
     if (!req.nextauth.token) {
       return NextResponse.redirect(new URL("/auth/login", req.url));
     }
-
-    // check if user is authenticated and access root path then redirect to pickup page
-    if (req.nextauth.token && pathname === "/") {
-      return NextResponse.redirect(new URL("/pickup", req.url));
-    }
   },
   {
     callbacks: {

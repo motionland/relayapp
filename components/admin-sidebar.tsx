@@ -1,21 +1,17 @@
-"use client"
+"use client";
 
-import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import {
   Settings,
   Building,
   Home,
   Package,
-  Users,
-  BarChart3,
+  Truck,
   FileText,
   User,
   Bell,
-  Cog,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,19 +19,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { HelpCircle, LogOut, ChevronUp, ChevronDown } from "lucide-react"
-import { useCallback, useState } from "react"
-import { useAppDispatch } from "@/redux"
-import { logout } from "@/redux/feature/authentication/authenticationThunks"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HelpCircle, LogOut } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 export default function AdminSidebar() {
-  const pathname = usePathname()
-  const { refresh } = useRouter()
-  const dispatch = useAppDispatch()
-  const [managementSectionCollapsed, setManagementSectionCollapsed] = useState(true)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const [businessSectionCollapsed, setBusinessSectionCollapsed] =
+    useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
     {
@@ -46,101 +44,95 @@ export default function AdminSidebar() {
     {
       href: "/admin/packages",
       icon: <Package className="h-5 w-5" />,
-      label: "All Packages",
-    },
-    {
-      href: "/admin/bussiness-applications",
-      icon: <FileText className="h-5 w-5" />,
-      label: "Business Applications",
+      label: "Packages (29)",
     },
     {
       href: "/admin/settings",
       icon: <Settings className="h-5 w-5" />,
       label: "Settings",
     },
-  ]
+  ];
 
-  const managementItems = [
+  const businessItems = [
     {
-      href: "/admin/users",
-      icon: <Users className="h-5 w-5" />,
-      label: "Users",
-    },
-    {
-      href: "/admin/warehouses",
+      href: "/admin/business-applications",
       icon: <Building className="h-5 w-5" />,
-      label: "Warehouses",
+      label: "Business App",
     },
     {
-      href: "/admin/reports",
-      icon: <BarChart3 className="h-5 w-5" />,
-      label: "Reports",
+      href: "/admin/business-packages",
+      icon: <Package className="h-5 w-5" />,
+      label: "Business Packages",
     },
-  ]
-
-  const systemItems = [
     {
-      href: "/admin/system",
+      href: "/create-delivery",
+      icon: <Truck className="h-5 w-5" />,
+      label: "Create Delivery",
+    },
+    {
+      href: "/get-estimate",
       icon: <FileText className="h-5 w-5" />,
-      label: "System Logs",
+      label: "Get An Estimate",
     },
     {
-      href: "/admin/notifications",
-      icon: <Bell className="h-5 w-5" />,
-      label: "Notifications",
+      href: "/shipping-list",
+      icon: <Package className="h-5 w-5" />,
+      label: "Shipping List",
     },
     {
-      href: "/admin/sys-settings",
-      icon: <Cog className="h-5 w-5" />,
-      label: "System Settings",
+      href: "/members",
+      icon: <User className="h-5 w-5" />,
+      label: "Team Members",
     },
-  ]
+  ];
 
-  const handleLogout = useCallback(async () => {
-    await dispatch(
-      logout()
-    )
-    refresh()
-  }, [dispatch])
+  const accountItems = [
+    {
+      href: "/address-books",
+      icon: <FileText className="h-5 w-5" />,
+      label: "Address Books",
+    },
+    {
+      href: "/billing",
+      icon: <FileText className="h-5 w-5" />,
+      label: "Business Billing",
+    },
+  ];
 
   return (
     <div
-      className={`hidden md:flex md:flex-col md:min-h-screen bg-white dark:bg-black border-r border-gray-100 dark:border-gray-800 transition-all duration-300 relative ${
-        sidebarCollapsed ? "md:w-16" : "md:w-64"
+      className={`hidden md:flex md:flex-col bg-white dark:bg-black border-r border-gray-100 dark:border-gray-800 transition-all duration-300 relative ${
+        isCollapsed ? "md:w-16" : "md:w-64"
       }`}
     >
-      {/* Vertical Toggle Button */}
+      {/* Collapse/Expand Toggle Button */}
       <button
-        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-        className="absolute -right-3 top-8 z-10 flex items-center justify-center w-6 h-6 rounded-full bg-white dark:bg-black border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 text-gray-600 dark:text-gray-400 shadow-sm transition-all duration-200"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-6 z-10 h-6 w-6 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center transition-all duration-300"
       >
-        {sidebarCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        {isCollapsed ? (
+          <ChevronRight className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+        ) : (
+          <ChevronLeft className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+        )}
       </button>
 
-      {/* Logo - only show when expanded */}
-      {!sidebarCollapsed && (
-        <div className="p-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 text-white">
-            <span className="text-xl font-bold text-black">M</span>
-          </div>
-          <span className="text-xl font-semibold dark:text-white">Metro Admin</span>
+      {/* Logo */}
+      <div className="p-6 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 text-white flex-shrink-0">
+          <span className="text-xl font-bold text-black">M</span>
         </div>
-      )}
-
-      {/* Collapsed Logo - only show when collapsed */}
-      {sidebarCollapsed && (
-        <div className="p-4 flex items-center justify-center mt-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white">
-            <span className="text-sm font-bold text-black">M</span>
-          </div>
-        </div>
-      )}
+        {!isCollapsed && (
+          <span className="text-xl font-semibold dark:text-white">Metro</span>
+        )}
+      </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto text-sm">
+      <nav className="flex-1 px-3 py-4 overflow-y-auto text-sm h-full max-h-[calc(100vh-140px)]">
         <ul className="space-y-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/admin" && pathname?.startsWith(`${item.href}/`))
+            const isActive =
+              pathname === item.href || pathname?.startsWith(`${item.href}/`);
             return (
               <li key={item.href}>
                 <Link
@@ -149,41 +141,68 @@ export default function AdminSidebar() {
                     isActive
                       ? "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-medium"
                       : "text-gray-700 dark:text-gray-200"
-                  } ${sidebarCollapsed ? "justify-center" : ""}`}
-                  title={sidebarCollapsed ? item.label : undefined}
+                  }`}
+                  title={isCollapsed ? item.label : undefined}
                 >
-                  <span className={isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-500"}>{item.icon}</span>
-                  {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
+                  <span
+                    className={`flex-shrink-0 ${
+                      isActive
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {item.icon}
+                  </span>
+                  {!isCollapsed && (
+                    <span className="font-medium">
+                      {item.label.includes("(") ? (
+                        <>
+                          {item.label.split("(")[0]}
+                          <span className="ml-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-red-500 text-white">
+                            {item.label.split("(")[1].replace(")", "")}
+                          </span>
+                        </>
+                      ) : (
+                        item.label
+                      )}
+                    </span>
+                  )}
                 </Link>
               </li>
-            )
+            );
           })}
         </ul>
 
-        {/* Management Section - only show when expanded */}
-        {!sidebarCollapsed && (
+        {/* Business Section */}
+        {!isCollapsed && (
           <div className="mt-8">
             <div
               className="flex items-center justify-between px-4 cursor-pointer group"
-              onClick={() => setManagementSectionCollapsed(!managementSectionCollapsed)}
+              onClick={() =>
+                setBusinessSectionCollapsed(!businessSectionCollapsed)
+              }
             >
               <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Management
+                Business
               </h3>
               <ChevronDown
                 className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
-                  managementSectionCollapsed ? "" : "rotate-180"
+                  businessSectionCollapsed ? "" : "rotate-180"
                 }`}
               />
             </div>
             <div
               className={`mt-2 overflow-hidden transition-all duration-200 ${
-                managementSectionCollapsed ? "max-h-0 opacity-0" : "max-h-[500px] opacity-100"
+                businessSectionCollapsed
+                  ? "max-h-0 opacity-0"
+                  : "max-h-[500px] opacity-100"
               }`}
             >
               <ul className="space-y-1">
-                {managementItems.map((item) => {
-                  const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`)
+                {businessItems.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    pathname?.startsWith(`${item.href}/`);
                   return (
                     <li key={item.href}>
                       <Link
@@ -194,24 +213,43 @@ export default function AdminSidebar() {
                             : "text-gray-700 dark:text-gray-200"
                         }`}
                       >
-                        <span className={isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-500"}>
+                        <span
+                          className={`flex-shrink-0 ${
+                            isActive
+                              ? "text-blue-600 dark:text-blue-400"
+                              : "text-gray-500"
+                          }`}
+                        >
                           {item.icon}
                         </span>
-                        <span className="font-medium">{item.label}</span>
+                        <span className="font-medium">
+                          {item.label.includes("(") ? (
+                            <>
+                              {item.label.split("(")[0]}
+                              <span className="ml-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-red-500 text-white">
+                                {item.label.split("(")[1].replace(")", "")}
+                              </span>
+                            </>
+                          ) : (
+                            item.label
+                          )}
+                        </span>
                       </Link>
                     </li>
-                  )
+                  );
                 })}
               </ul>
 
-              {/* System Section (moved inside Management group) */}
+              {/* Account Section (moved inside Business group) */}
               <div className="mt-6 pl-2 border-l-2 border-gray-100 dark:border-gray-800 ml-2">
                 <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  System
+                  Account
                 </h3>
                 <ul className="mt-2 space-y-1">
-                  {systemItems.map((item) => {
-                    const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`)
+                  {accountItems.map((item) => {
+                    const isActive =
+                      pathname === item.href ||
+                      pathname?.startsWith(`${item.href}/`);
                     return (
                       <li key={item.href}>
                         <Link
@@ -222,13 +260,30 @@ export default function AdminSidebar() {
                               : "text-gray-700 dark:text-gray-200"
                           }`}
                         >
-                          <span className={isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-500"}>
+                          <span
+                            className={`flex-shrink-0 ${
+                              isActive
+                                ? "text-blue-600 dark:text-blue-400"
+                                : "text-gray-500"
+                            }`}
+                          >
                             {item.icon}
                           </span>
-                          <span className="font-medium">{item.label}</span>
+                          <span className="font-medium">
+                            {item.label.includes("(") ? (
+                              <>
+                                {item.label.split("(")[0]}
+                                <span className="ml-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-red-500 text-white">
+                                  {item.label.split("(")[1].replace(")", "")}
+                                </span>
+                              </>
+                            ) : (
+                              item.label
+                            )}
+                          </span>
                         </Link>
                       </li>
-                    )
+                    );
                   })}
                 </ul>
               </div>
@@ -239,69 +294,65 @@ export default function AdminSidebar() {
 
       {/* User Profile */}
       <div className="p-6 border-t border-gray-100 dark:border-gray-800">
-        {sidebarCollapsed ? (
-          // Collapsed profile - just avatar
-          <div className="flex justify-center">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="/placeholder.svg" />
-              <AvatarFallback className="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs font-semibold">
-                AD
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        ) : (
-          // Expanded profile with dropdown
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 p-2 rounded-lg">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback className="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-semibold">
-                    AD
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <span className="font-medium dark:text-white">Admin</span>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">admin@metro.com</p>
-                </div>
-                <ChevronUp className="h-4 w-4 text-gray-400" />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin/settings" className="flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell className="mr-2 h-4 w-4" />
-                <span>Notifications</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <HelpCircle className="mr-2 h-4 w-4" />
-                <span>Support</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <FileText className="mr-2 h-4 w-4" />
-                <span>Documentation</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 p-2 rounded-lg">
+              <Avatar className="h-10 w-10 flex-shrink-0">
+                <AvatarImage src="/placeholder.svg" alt="User" />
+                <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
+                  {session?.user?.name?.split(" ")?.[0]?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              {!isCollapsed && (
+                <>
+                  <div className="flex-1">
+                    <span className="font-medium dark:text-white">
+                      {session?.user?.name}
+                    </span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {session?.user?.email}
+                    </p>
+                  </div>
+                  <ChevronUp className="h-4 w-4 text-gray-400" />
+                </>
+              )}
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Bell className="mr-2 h-4 w-4" />
+              <span>Notifications</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <HelpCircle className="mr-2 h-4 w-4" />
+              <span>Support</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <FileText className="mr-2 h-4 w-4" />
+              <span>Documentation</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-red-600"
+              onClick={() => signOut({ callbackUrl: "/login" })}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
-  )
+  );
 }
