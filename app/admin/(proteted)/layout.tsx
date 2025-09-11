@@ -8,10 +8,5 @@ export default function AdminRootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const token = cookies().get("auth_token")?.value
-  
-    if (!token) {
-      redirect("/admin/auth/login") 
-    }
   return <AdminLayout>{children}</AdminLayout>
 }

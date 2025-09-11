@@ -1,13 +1,13 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import LoginCard from "@/components/auth/LoginCard"
+import AuthOptionsCard from "@/components/auth/AuthOption"
 
-export default function AdminLoginPage() {
+export default function AuthOptionPage() {
   const token = cookies().get("auth_token")?.value
 
   if (token) {
     redirect("/") 
   }
 
-  return <LoginCard />;
+  return <AuthOptionsCard />;
 }
