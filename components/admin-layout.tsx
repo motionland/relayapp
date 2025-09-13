@@ -13,7 +13,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   
   // Hide the layout if the route is the root path
-  if (pathname === "/") {
+  if (pathname === "/" || pathname.startsWith("/auth")) {
     return <>{children}</>;
   }
   

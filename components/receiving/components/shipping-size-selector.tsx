@@ -17,7 +17,6 @@ enum ShippingSize {
 
 const ShippingSizeSelector = () => {
   const dispatch = useAppDispatch();
-  const receivingState = useAppSelector((state) => state.receiving);
 
   const shippingSizes = {
     "1": ShippingSize.SMALL,

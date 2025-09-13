@@ -7,38 +7,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateReceivingState, useAppDispatch } from "@/redux";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { fetchCarriers, CarrierResponse } from "@/lib/carriers";
+import { useCarriers } from "@/hooks/use-carriers";
 
 const CarrierSelector = () => {
-  const {data: session} = useSession();
   const dispatch = useAppDispatch();
-  
-  const [carriers, setCarriers] = useState<CarrierResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data: carriers, isLoading } = useCarriers();
 
-  useEffect(() => {
-    if (session) {
-      const loadCarriers = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const data = await fetchCarriers(session);
-          setCarriers(data);
-        } catch (err) {
-          setError("Failed to load carriers");
-          console.error("Error fetching carriers:", err);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      loadCarriers();
-    }
-  }, [session]);
-  
   return (
     <div className="w-full space-y-4">
       <div className="flex flex-col space-y-2">
@@ -48,7 +22,12 @@ const CarrierSelector = () => {
         <Select
           disabled={isLoading}
           onValueChange={(value) =>
-            dispatch(updateReceivingState({ key: "carrier", value: { id: Number(value), name: value } }))
+            dispatch(
+              updateReceivingState({
+                key: "carrier",
+                value: { id: Number(value), name: value },
+              })
+            )
           }
         >
           <SelectTrigger className="w-full">

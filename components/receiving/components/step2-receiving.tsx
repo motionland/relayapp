@@ -14,10 +14,11 @@ import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppSelector, useAppDispatch, updateReceivingState } from "@/redux";
-import { fetchCustomerLookup, CustomerLookupResponse } from "@/lib/customer-lookup";
+import {
+  useCustomerLookup,
+} from "@/hooks/use-customer-lookup";
 
 const ConfirmCustomerCodeStep = () => {
-  const { data: session } = useSession();
   const receivingState = useAppSelector((state) => state.receiving);
   const dispatch = useAppDispatch();
   const [showManualInput, setShowManualInput] = useState(false);
@@ -28,72 +29,61 @@ const ConfirmCustomerCodeStep = () => {
   const prevCustomerCode = useRef<string | undefined>(undefined);
   const prevSearchCode = useRef<string>("");
 
-  const [manualCustomerData, setManualCustomerData] = useState<any>(null);
-  const [manualLookupLoading, setManualLookupLoading] = useState(false);
+  // Use the customer lookup hook for manual search
+  const {
+    data: manualCustomerData,
+    isLoading: manualLookupLoading,
+    isError: manualLookupError,
+    lookupCustomer: lookupManualCustomer,
+  } = useCustomerLookup();
 
-  const [autoCustomerData, setAutoCustomerData] = useState<any>(null);
-  const [autoCustomerLookupLoading, setAutoCustomerLookupLoading] = useState(false);
-
+  // Use the customer lookup hook for auto search
+  const {
+    data: autoCustomerData,
+    isLoading: autoCustomerLookupLoading,
+    isError: autoCustomerLookupError,
+    lookupCustomer: lookupAutoCustomer,
+  } = useCustomerLookup();
 
   useEffect(() => {
     if (searchCode) {
-      const fetchManualCustomer = async () => {
-        setManualLookupLoading(true);
-        try {
-          const data = await fetchCustomerLookup(searchCode);
-          setManualCustomerData(data);
-        } catch (error) {
-          setManualCustomerData(null);
-        } finally {
-          setManualLookupLoading(false);
-        }
-      };
-
-      fetchManualCustomer();
+      lookupManualCustomer(searchCode);
     }
-  }, [searchCode]);
+  }, [searchCode, lookupManualCustomer]);
 
   useEffect(() => {
     if (receivingState.customerCode) {
-      const fetchAutoCustomer = async () => {
-        setAutoCustomerLookupLoading(true);
-        try {
-          const data = await fetchCustomerLookup(receivingState.customerCode || "");
-          setAutoCustomerData(data);
-        } catch (error) {
-          setAutoCustomerData(null);
-        } finally {
-          setAutoCustomerLookupLoading(false);
-        }
-      };
-
-      fetchAutoCustomer();
+      lookupAutoCustomer(receivingState.customerCode);
     }
-  }, [receivingState.customerCode]);
+  }, [receivingState.customerCode, lookupAutoCustomer]);
 
   const hasLabel = Boolean(receivingState.customerCode);
-  
+
   const isValidCustomerData = (customerResponse: any) => {
-    return customerResponse?.success === true && 
-           customerResponse?.data && 
-           customerResponse?.data.id && 
-           customerResponse?.data.shipping_code;
+    return (
+      customerResponse?.success === true &&
+      customerResponse?.data &&
+      customerResponse?.data.id &&
+      customerResponse?.data.shipping_code
+    );
   };
-  
+
   const hasValidManualCustomer = isValidCustomerData(manualCustomerData);
   const hasValidAutoCustomer = isValidCustomerData(autoCustomerData);
   const hasValidCustomer = hasValidManualCustomer || hasValidAutoCustomer;
 
-  console.log("receivingState", receivingState);
-  console.log("manualCustomerData:", manualCustomerData);
-  console.log("autoCustomerData:", autoCustomerData);
-  console.log("hasValidCustomer:", hasValidCustomer);
+  // console.log("receivingState", receivingState);
+  // console.log("manualCustomerData:", manualCustomerData);
+  // console.log("autoCustomerData:", autoCustomerData);
+  // console.log("hasValidCustomer:", hasValidCustomer);
 
   const handleContinueStep = () => {
-    const customerData = hasValidManualCustomer ? manualCustomerData?.data : autoCustomerData?.data;
-    
+    const customerData = hasValidManualCustomer
+      ? manualCustomerData?.data
+      : autoCustomerData?.data;
+
     if (customerData) {
-      console.log("Setting customer data:", customerData);
+      // console.log("Setting customer data:", customerData);
       dispatch(updateReceivingState({ key: "customer", value: customerData }));
       dispatch(updateReceivingState({ key: "currentStep", value: 3 }));
     }
@@ -163,8 +153,9 @@ const ConfirmCustomerCodeStep = () => {
           </div>
 
           {/* Customer not found message */}
-          {((searchCode && manualCustomerData?.success === false) || 
-            (receivingState.customerCode && autoCustomerData?.success === false)) && (
+          {((searchCode && manualCustomerData?.success === false) ||
+            (receivingState.customerCode &&
+              autoCustomerData?.success === false)) && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-start">
                 <XCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
@@ -196,24 +187,32 @@ const ConfirmCustomerCodeStep = () => {
                 {hasValidCustomer ? (
                   <>
                     <Badge className="bg-blue-100 text-blue-700 border-0 px-3 py-1 text-sm font-medium">
-                      {(hasValidManualCustomer ? manualCustomerData?.data?.shipping_code : autoCustomerData?.data?.shipping_code) || searchCode || receivingState.customerCode}
+                      {(hasValidManualCustomer
+                        ? manualCustomerData?.data?.shipping_code
+                        : autoCustomerData?.data?.shipping_code) ||
+                        searchCode ||
+                        receivingState.customerCode}
                     </Badge>
                     <div className="flex items-center text-green-600">
                       <Check className="h-4 w-4" />
                       <span className="text-xs ml-1">Verified</span>
                     </div>
                   </>
-                ) : (manualLookupLoading || autoCustomerLookupLoading) ? (
+                ) : manualLookupLoading || autoCustomerLookupLoading ? (
                   <>
                     <Badge className="bg-amber-100 text-amber-700 border-0 px-3 py-1 text-sm font-medium">
-                      {searchCode || receivingState.customerCode || "Verifying..."}
+                      {searchCode ||
+                        receivingState.customerCode ||
+                        "Verifying..."}
                     </Badge>
-                    <div className="flex items-center text-amber-600">
-                      <AlertCircle className="h-4 w-4" />
-                      <span className="text-xs ml-1">Verifying...</span>
-                    </div>
+                    {(manualLookupError || autoCustomerLookupError) && (
+                      <div className="flex items-center gap-2 text-red-500">
+                        <AlertCircle className="h-4 w-4" />
+                        <span>Customer not found. Please try again.</span>
+                      </div>
+                    )}
                   </>
-                ) : (searchCode || receivingState.customerCode) ? (
+                ) : searchCode || receivingState.customerCode ? (
                   <Badge className="bg-red-100 text-red-700 border-0 px-3 py-1 text-sm font-medium">
                     {searchCode || receivingState.customerCode}
                   </Badge>

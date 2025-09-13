@@ -1,13 +1,5 @@
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 import LoginCard from "@/components/auth/LoginCard"
 
 export default function AdminLoginPage() {
-  const token = cookies().get("auth_token")?.value
-
-  if (token) {
-    redirect("/") 
-  }
-
   return <LoginCard />;
 }

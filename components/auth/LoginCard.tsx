@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux";
 import { updateLoginState } from "@/redux/feature/authentication/loginSlice";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import FloatingInput from "../floating-input";
 import PhoneInput from "../ui/phone-input";
 

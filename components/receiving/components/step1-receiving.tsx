@@ -12,7 +12,7 @@ import {
   Snowflake,
   Tag,
   X,
-  Loader2, 
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,10 @@ import OCRScanner from "./ocr-scanner";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { updateReceivingState, useAppDispatch, useAppSelector } from "@/redux";
-import { createPackage, CreatePackagePayload } from "@/lib/package-creation";
+import {
+  useCreatePackage,
+  CreatePackagePayload,
+} from "@/hooks/use-package-creation";
 
 const getPackageTypeInfo = (type: string | undefined) => {
   switch (type?.toUpperCase()) {
@@ -55,10 +58,10 @@ const getPackageTypeInfo = (type: string | undefined) => {
 };
 
 const Step1Receiving = () => {
-  const { data: session } = useSession(); 
+  const { data: session } = useSession();
   const receivingState = useAppSelector((state) => state.receiving);
   const dispatch = useAppDispatch();
-  
+
   const [processingIndices, setProcessingIndices] = useState<number[]>([]);
   const [isBatchProcessing, setIsBatchProcessing] = useState(false);
 
@@ -66,13 +69,17 @@ const Step1Receiving = () => {
     if (isBatchProcessing) return;
     setIsBatchProcessing(true);
 
+    const { execute } = useCreatePackage();
+
     for (let i = 0; i < receivingState.scannedItems.length; i++) {
       setProcessingIndices((prev) => [...prev, i]);
       try {
-        await createPackage(session!, {
+        await execute(session!, {
           carrier_id: receivingState.scannedItems[i].carrier!.id,
-          shipping_address_id: receivingState.scannedItems[i].shippingAddress!.id,
-          warehouse_location_id: receivingState.scannedItems[i].warehouseLocationId!,
+          shipping_address_id:
+            receivingState.scannedItems[i].shippingAddress!.id,
+          warehouse_location_id:
+            receivingState.scannedItems[i].warehouseLocationId!,
           customer_id: receivingState.scannedItems[i].customer?.id!,
           tracking_number: receivingState.scannedItems[i].carrierTracking!,
           arrival_time: receivingState.scannedItems[i].arrivalTime!,
@@ -135,11 +142,7 @@ const Step1Receiving = () => {
                 <p className="text-gray-400 text-sm mt-1">
                   Scan items to add them to the current batch
                 </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-4"
-                >
+                <Button variant="outline" size="sm" className="mt-4">
                   <Scan className="h-4 w-4 mr-2" />
                   Start Scanning
                 </Button>

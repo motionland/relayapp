@@ -1,29 +1,28 @@
 "use client";
-import React, { useCallback } from "react";
-import Step1Receiving from "./components/step1-receiving";
-import Step2Receiving from "./components/step2-receiving";
-import Step3Receiving from "./components/step3-receiving";
-import Step4Receiving from "./components/step4-receiving";
-import { Building, History, Package, User } from "lucide-react";
+import React from "react";
+import Step1Pickup from "./components/step1pickup";
+import Step2Pickup from "./components/step2-pickup";
+import Step3Pickup from "./components/step3-pickup";
+import Step4Pickup from "./components/step4-pickup";
+import Step5Pickup from "./components/step5-pickup";
+import { Building, ChevronRight, History, Package, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useAppSelector } from "@/redux";
-import { useEffect, useState } from "react";
-import {
-  usePackageActivityToday,
-  PackageActivityResponse,
-} from "@/hooks/use-package-activity";
-import {
-  fetchRecentReceiving,
-  RecentReceivingResponse,
-  useRecentReceiving,
-} from "@/hooks/use-recent-receiving";
+import { usePackageActivityToday } from "@/hooks/use-package-activity";
+import { useRecentPickup } from "@/hooks/use-recent-pickup";
 
-const ReceivingViewDekstop = () => {
-  const receivingState = useAppSelector((state) => state.receiving);
-
-  const { data: activityData, isLoading: activityLoading, isError: activityError } = usePackageActivityToday();
-
-  const { data: recentData, isLoading: recentLoading, isError: recentError } = useRecentReceiving();
+const PickupViewDesktop = () => {
+  const pickupState = useAppSelector((state) => state.pickup);
+  const {
+    data: activityData,
+    isLoading: activityLoading,
+    isError: activityError,
+  } = usePackageActivityToday();
+  const {
+    data: recentData,
+    isLoading: recentLoading,
+    isError: recentError,
+  } = useRecentPickup();
 
   // Fallback values while loading or in case of error
   const scanned = activityData?.data?.scanned ?? 0;
@@ -32,17 +31,19 @@ const ReceivingViewDekstop = () => {
   const recentPackages = recentData?.data ?? [];
 
   const renderStepContent = () => {
-    switch (receivingState.currentStep) {
+    switch (pickupState.currentStep) {
       case 1:
-        return <Step1Receiving />;
+        return <Step1Pickup />;
       case 2:
-        return <Step2Receiving />;
+        return <Step2Pickup />;
       case 3:
-        return <Step3Receiving />;
+        return <Step3Pickup />;
       case 4:
-        return <Step4Receiving />;
+        return <Step4Pickup />;
+      case 5:
+        return <Step5Pickup />;
       default:
-        return <div>Step 1</div>;
+        return null;
     }
   };
 
@@ -88,32 +89,32 @@ const ReceivingViewDekstop = () => {
           <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
             <h5 className="flex items-center text-lg font-bold text-gray-800 mb-2">
               <History className="h-6 w-6 text-gray-600 mr-2" />
-              Recent Receiving
+              Recent Pickups
             </h5>
 
             <div className="w-full bg-gray-50 border border-gray-200 rounded-xl overflow-hidden shadow-sm">
               <div className="px-4 pt-4 pb-3 bg-white">
                 <h6 className="text-base font-semibold text-gray-800">
-                  Receiving history
+                  Pickup history
                 </h6>
                 <p className="text-sm text-gray-500">
-                  Your recent package receiving activity
+                  Your recent package pickup activity
                 </p>
               </div>
 
               {recentLoading ? (
                 <div className="bg-white py-4 text-center">
-                  <p>Loading recent receiving...</p>
+                  <p>Loading recent pickups...</p>
                 </div>
               ) : recentError ? (
                 <div className="bg-white py-4 text-center">
                   <p className="text-red-500">
-                    Error loading recent receiving data
+                    Error loading recent pickup data
                   </p>
                 </div>
               ) : recentPackages.length === 0 ? (
                 <div className="bg-white py-4 text-center">
-                  <p>No recent receiving activity</p>
+                  <p>No recent pickup activity</p>
                 </div>
               ) : (
                 recentPackages.map((pkg, index) => (
@@ -187,4 +188,4 @@ const ReceivingViewDekstop = () => {
   );
 };
 
-export default ReceivingViewDekstop;
+export default PickupViewDesktop;

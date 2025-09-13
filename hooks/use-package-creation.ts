@@ -1,6 +1,6 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Session } from "next-auth";
-import api from "../../helper/axios";
+import api from "../redux/helper/axios";
+import { useState } from "react";
 
 export interface CreatePackagePayload {
   user_id?: number | null;
@@ -19,6 +19,12 @@ export interface CreatePackagePayload {
   sender_from: string;
   label_id?: number | null;
   package_images?: Array<File | string>;
+}
+
+export interface CreatePackageResponse {
+  success: boolean;
+  message: string;
+  data?: any;
 }
 
 const dataUrlToFile = async (dataUrl: string, filename: string) => {
@@ -53,25 +59,45 @@ const buildFormData = async (input: CreatePackagePayload) => {
   return fd;
 };
 
-export const createPackage = createAsyncThunk(
-  "receiving/createPackage",
-  async ({ session, input }: { session: Session | null; input: CreatePackagePayload }, { rejectWithValue }) => {
-    try {
-      if (!session?.auth_token) {
-        throw new Error("Unauthenticated: session/auth_token missing");
-      }
-      
-      const formData = await buildFormData(input);
-      
-      const response = await api.post("/v1/admin/package", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || error.message || "Failed to create package");
-    }
+export const createPackage = async (session: Session | null, input: CreatePackagePayload) => {
+  if (!session?.auth_token) {
+    throw new Error("Unauthenticated: session/auth_token missing");
   }
-);
+  
+  const formData = await buildFormData(input);
+  
+  const response = await api.post("/admin/package", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  
+  return response.data;
+};
+
+export const useCreatePackage = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [data, setData] = useState<CreatePackageResponse | null>(null);
+
+  const execute = async (session: Session | null, input: CreatePackagePayload) => {
+    setIsLoading(true);
+    setIsError(false);
+    setError(null);
+    
+    try {
+      const response = await createPackage(session, input);
+      setData(response);
+      return response;
+    } catch (err) {
+      setIsError(true);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { execute, data, isLoading, isError, error };
+};

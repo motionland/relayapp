@@ -7,37 +7,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { updateReceivingState, useAppDispatch } from "@/redux";
-import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
-import { fetchShippingAddresses, ShippingAddressResponse } from "@/lib/shipping-addresses";
+import { useShippingAddresses } from "@/hooks/use-shipping-addresses";
 
 const ShippingAddressSelector = () => {
-  const {data: session} = useSession();
   const dispatch = useAppDispatch();
-  
-  const [shippingAddresses, setShippingAddresses] = useState<ShippingAddressResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (session) {
-      const loadShippingAddresses = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const data = await fetchShippingAddresses(session);
-          setShippingAddresses(data);
-        } catch (err) {
-          setError("Failed to load shipping addresses");
-          console.error("Error fetching shipping addresses:", err);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      loadShippingAddresses();
-    }
-  }, [session]);
+  const { data: shippingAddresses, isLoading } = useShippingAddresses();
 
   return (
     <div className="w-full space-y-4">
@@ -48,7 +23,12 @@ const ShippingAddressSelector = () => {
         <Select
           disabled={isLoading}
           onValueChange={(value) =>
-            dispatch(updateReceivingState({ key: "shippingAddress", value: { id: Number(value), name: value } }))
+            dispatch(
+              updateReceivingState({
+                key: "shippingAddress",
+                value: { id: Number(value), name: value },
+              })
+            )
           }
         >
           <SelectTrigger className="w-full">
@@ -59,14 +39,19 @@ const ShippingAddressSelector = () => {
               Select a shipping address
             </SelectItem>
             {shippingAddresses?.data?.map((shippingAddress) => (
-              <SelectItem key={shippingAddress.value} value={shippingAddress.value}>
+              <SelectItem
+                key={shippingAddress.value}
+                value={shippingAddress.value}
+              >
                 {shippingAddress.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         {isLoading && (
-          <p className="text-sm text-muted-foreground">Loading shipping addresses...</p>
+          <p className="text-sm text-muted-foreground">
+            Loading shipping addresses...
+          </p>
         )}
       </div>
     </div>

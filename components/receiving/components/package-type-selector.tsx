@@ -9,36 +9,16 @@ import {
 import { updateReceivingState, useAppDispatch, useAppSelector } from "@/redux";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { fetchPackageTypes, PackageTypeResponse } from "@/lib/package-types";
+import {
+  fetchPackageTypes,
+  PackageTypeResponse,
+  usePackageTypes,
+} from "@/hooks/use-package-types";
 
 const PackageTypeSelector = () => {
-  const { data: session } = useSession();
   const dispatch = useAppDispatch();
-  const receivingState = useAppSelector((state) => state.receiving);
-
-  const [packageTypes, setPackageTypes] = useState<PackageTypeResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (session) {
-      const loadPackageTypes = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const data = await fetchPackageTypes(session);
-          setPackageTypes(data);
-        } catch (err) {
-          setError("Failed to load package types");
-          console.error("Error fetching package types:", err);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      loadPackageTypes();
-    }
-  }, [session]);
+  
+  const { data: packageTypes, isLoading } = usePackageTypes();
 
   return (
     <div className="w-full space-y-4">
@@ -52,10 +32,15 @@ const PackageTypeSelector = () => {
             const selectedType = packageTypes?.data.find(
               (type) => type.value === value
             );
-            dispatch(updateReceivingState({ key: "package_type", value: {
-              id: Number(value),
-              name: selectedType?.label || value,
-            }}));
+            dispatch(
+              updateReceivingState({
+                key: "package_type",
+                value: {
+                  id: Number(value),
+                  name: selectedType?.label || value,
+                },
+              })
+            );
           }}
         >
           <SelectTrigger className="w-full">

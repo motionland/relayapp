@@ -4,6 +4,7 @@ import { loginReducer, registerReducer } from "./feature/authentication";
 import { notificationReducer } from "./feature/notification";
 import { emailTempleteReducer } from "./feature/emailTemplete";
 import { receivingReducer } from "./feature/receiving";
+import { pickupReducer } from "./feature/pickup";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     notification: notificationReducer,
     emailTemplete: emailTempleteReducer,
     receiving: receivingReducer,
+    pickup: pickupReducer,
   },
   // middleware: (getDefault) => getDefault(), // default fine
 });

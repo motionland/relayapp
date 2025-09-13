@@ -8,7 +8,6 @@ import {
   ShippingSizeType,
   PackageType,
 } from "./types";
-import { createPackage } from "./receivingThunks";
 
 // Initial state
 const initialReceivingState: ReceivingState = {
@@ -79,19 +78,6 @@ const receivingSlice = createSlice({
 
     // Reset the entire receiving state
     resetAllReceiving: () => initialReceivingState,
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(createPackage.pending, (state) => {
-        // Handle pending state if needed
-      })
-      .addCase(createPackage.fulfilled, (state, action) => {
-        // Handle successful package creation if needed
-      })
-      .addCase(createPackage.rejected, (state, action) => {
-        // Handle error state if needed
-        console.error("Failed to create package:", action.payload);
-      });
   },
 });
 
